@@ -43,7 +43,7 @@ get '/' do
 end
 
 get "/unflag/:photo_id" do
-  do_auth()
+  #do_auth()
   
   coll = MONGO_DB.collection("flags")
   
