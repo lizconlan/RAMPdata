@@ -40,3 +40,25 @@ get '/' do
 
   haml :index
 end
+
+get "/unflag/:photo_id" do
+  do_auth()
+  
+  coll = MONGO_DB.collection("flags")
+  
+  coll.remove("photo_id" => "#{params[:photo_id]}")
+  
+  if params[:return]
+    redirect "#{params[:return]}"
+  else
+    redirect "/admin"
+  end
+end
+
+private
+  def do_auth
+    ip = @env["REMOTE_HOST"]
+    ip = @env["REMOTE_ADDR"] unless ip
+    ip = @env["HTTP_X_REAL_IP"] unless ip
+    authorize!(ip)
+  end
