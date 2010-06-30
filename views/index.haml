@@ -3,11 +3,11 @@ This is supposed to be a photo of #{@first['name']}
 %br
 %br
 
-%img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}_m.jpg"}
+%img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
 
 %br
 
 %a{:href => "http://www.flickr.com/photos/#{@first['author_id']}/#{@first['photo_id'].to_s}"}
-	View this photo in Flickr
+	View this photo on Flickr
 	
 %br
