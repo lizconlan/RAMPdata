@@ -39,8 +39,6 @@ get '/' do
   
   @mp_name = format_name_for_url(@first['name'])
 
-  @other_photos = coll.find({ "author_id" => "#{@first['author_id']}", "photo_id" => { "$not" => /^#{@first['photo_id']}$/ } } )
-
   haml :index
 end
 
@@ -89,26 +87,95 @@ get "/stop_mp_photo/:mp_name/:photo_id" do
   end
 end
 
-get "/stop_photo/:photo_id" do
+get "/stop_photo/f/:photo_id" do
   #do_auth()
   
-  photo_id =  params[:photo_id]
+  @photo_id =  params[:photo_id]
   
   #get the flag values to move across
   coll = MONGO_DB.collection("flags")
-  photo = coll.find("photo_id" => "#{photo_id}").next_document()
+  photo = coll.find("photo_id" => "#{@photo_id}").next_document()
   
-  if photo
-  #add a new document to the stoplist
-    coll = MONGO_DB.collection("stoplist")
-    new_photo_doc = {"photo_id" => "#{photo_id}", "flickr_secret" => "#{photo["flickr_secret"]}", "flickr_farm" => "#{photo["flickr_farm"]}", "flickr_server" => "#{photo["flickr_server"]}", "author_id" => "#{photo["author_id"]}"}
-    coll.insert(new_photo_doc)
+  if photo.count > 0
+    stoplist_photo(@photo_id, photo)
+    if params[:return]
+      redirect "#{params[:return]}"
+    else
+      redirect "/"
+    end
   end
+end
+
+get "/stop_photo/:photo_id" do
+  #do_auth()
   
-  #remove the "old" document from the flags collection
+  @photo_id =  params[:photo_id]
+  
+  #get the flag values to move across
   coll = MONGO_DB.collection("flags")
-  coll.remove("photo_id" => "#{photo_id}")
+  photo = coll.find("photo_id" => "#{@photo_id}").next_document()
   
+  @author_id = photo["author_id"]
+  @author_name = photo["author_name"]
+  
+  if photo.count > 0
+    @other_photos = coll.find({ "author_id" => "#{photo['author_id']}", "photo_id" => { "$not" => /^#{@photo_id}$/ } } )
+        
+    if @other_photos.count > 0
+      haml :flickr_account
+    else
+      stoplist_photo(@photo_id, photo)
+      if params[:return]
+        redirect "#{params[:return]}"
+      else
+        redirect "/"
+      end
+    end
+  else
+    if params[:return]
+      redirect "#{params[:return]}"
+    else
+      redirect "/"
+    end
+  end
+end
+
+get "/stop_flickr_user/:user_id" do
+  #do_auth()
+
+  coll = MONGO_DB.collection("stoplist")
+
+  user_doc = coll.find("users" => /.+/)
+  first = user_doc.next_document()
+
+  unless first
+    redirect "/admin"
+  else
+    users = first["users"]
+    names = first["users_names"]
+  end
+
+  coll = MONGO_DB.collection("flags")
+  unless users.include?([params[:user_id]])
+    flags = coll.find("author_id" => "#{params[:user_id]}")
+    first = flags.next_document()
+    if first
+      user_name = first["author_name"]
+    else
+      user_name = ""
+    end
+    users << params[:user_id]
+    names << user_name
+
+    new_user_doc = {"users" => users, "users_names" => names}
+
+    coll = MONGO_DB.collection("stoplist")
+    meep = coll.update({ "users" => /.+/}, new_user_doc)
+  end
+
+  coll = MONGO_DB.collection("flags")
+  coll.remove("author_id" => "#{params[:user_id]}")
+
   if params[:return]
     redirect "#{params[:return]}"
   else
@@ -149,4 +216,15 @@ private
 
   def format_name_for_url(name)
     name.downcase().gsub("-","--").gsub(" ","-")
+  end
+  
+  def stoplist_photo(photo_id, photo)
+    #add a new document to the stoplist
+      coll = MONGO_DB.collection("stoplist")
+      new_photo_doc = {"photo_id" => "#{photo_id}", "flickr_secret" => "#{photo["flickr_secret"]}", "flickr_farm" => "#{photo["flickr_farm"]}", "flickr_server" => "#{photo["flickr_server"]}", "author_id" => "#{photo["author_id"]}"}
+      coll.insert(new_photo_doc)
+
+    #remove the "old" document from the flags collection
+    coll = MONGO_DB.collection("flags")
+    coll.remove("photo_id" => "#{photo_id}")
   end

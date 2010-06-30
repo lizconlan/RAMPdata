@@ -1,0 +1,20 @@
+The Flickr user
+%strong= @author_name
+has other flagged photos
+
+%br 
+%br
+
+- while photo = @other_photos.next_document()
+  %img{:src => "http://farm#{photo["flickr_farm"].to_s}.static.flickr.com/#{photo["flickr_server"].to_s}/#{photo["photo_id"].to_s}_#{photo["flickr_secret"].to_s}_m.jpg"}
+  %br
+  
+%br
+%a{:href => "/stop_flickr_user/#{@author_id}"}
+  Add "#{@author_name}" to the stoplist instead
+  
+%br
+%br
+
+%a{:href => "/stop_photo/f/#{@photo_id}"}
+  Just stop the photo I clicked on before
