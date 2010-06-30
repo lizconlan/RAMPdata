@@ -36,5 +36,7 @@ get '/' do
   photos = coll.find()
   @first = photos.next_document
 
+  @other_photos = coll.find({ "author_id" => "#{@first['author_id']}", "photo_id" => { "$not" => /^#{@first['photo_id']}$/ } } )
+
   haml :index
 end
