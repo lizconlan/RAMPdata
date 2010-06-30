@@ -4,6 +4,7 @@ require 'json'
 require 'haml'
 require 'sass'
 require 'mongo'
+require 'helpers/auth'
 
 enable :sessions
 
