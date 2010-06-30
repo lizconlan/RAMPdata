@@ -52,7 +52,7 @@ get "/unflag/:photo_id" do
   if params[:return]
     redirect "#{params[:return]}"
   else
-    redirect "/admin"
+    redirect "/"
   end
 end
 
