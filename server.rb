@@ -36,6 +36,8 @@ get '/' do
   coll = MONGO_DB.collection("flags")
   photos = coll.find()
   @first = photos.next_document
+  
+  @mp_name = format_name_for_url(@first['name'])
 
   @other_photos = coll.find({ "author_id" => "#{@first['author_id']}", "photo_id" => { "$not" => /^#{@first['photo_id']}$/ } } )
 
@@ -56,10 +58,68 @@ get "/unflag/:photo_id" do
   end
 end
 
+get "/stop_mp_photo/:mp_name/:photo_id" do
+  #do_auth()
+  
+  coll = MONGO_DB.collection("stoplist")
+  
+  mp_name = mp_name_from_querystring(params[:mp_name])
+  
+  photo_id =  params[:photo_id]
+  
+  #get the flag values to move across
+  coll = MONGO_DB.collection("flags")
+  photo = coll.find("photo_id" => "#{photo_id}", "name" => "#{mp_name}").next_document()
+  
+  if photo
+    #add a new document to the stoplist
+    coll = MONGO_DB.collection("stoplist")
+    new_photo_doc = {"photo_id" => "#{photo_id}", "name" => "#{mp_name}", "flickr_secret" => "#{photo["flickr_secret"]}", "flickr_farm" => "#{photo["flickr_farm"]}", "flickr_server" => "#{photo["flickr_server"]}", "author_id" => "#{photo["author_id"]}"}
+    coll.insert(new_photo_doc)
+  end
+  
+  #remove the "old" document from the flags collection
+  coll = MONGO_DB.collection("flags")
+  coll.remove("photo_id" => "#{photo_id}", "name" => "#{mp_name}")
+  
+  if params[:return]
+    redirect "#{params[:return]}"
+  else
+    redirect "/"
+  end
+end
+
 private
   def do_auth
     ip = @env["REMOTE_HOST"]
     ip = @env["REMOTE_ADDR"] unless ip
     ip = @env["HTTP_X_REAL_IP"] unless ip
     authorize!(ip)
+  end
+  
+  def mp_name_from_querystring(param_name)
+    name = param_name.gsub("-", " ")
+    name.gsub!("  ", "-")
+
+    names = []
+    parts = name.split(" ")
+    parts.each do |part|
+      names << part.capitalize
+    end
+    
+    name = names.join(" ")
+    
+    if name =~ /\ Mc([a-z])/
+      name = name.gsub("Mc#{$1}", "Mc#{$1.upcase()}")
+    end
+    
+    if name =~ /\ Mac([a-z])/
+      name = name.gsub("Mac#{$1}", "Mac#{$1.upcase()}")
+    end
+    
+    name
+  end
+
+  def format_name_for_url(name)
+    name.downcase().gsub("-","--").gsub(" ","-")
   end
