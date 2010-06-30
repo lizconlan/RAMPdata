@@ -35,6 +35,6 @@ get '/' do
   coll = MONGO_DB.collection("flags")
   photos = coll.find()
   @first = photos.next_document
-  @first.inspect
+
   haml :index
 end
