@@ -33,9 +33,27 @@ end
 MONGO_DB = get_mongo_connection()
 
 get '/' do
+  unless session[:seen]
+    session[:seen] = ""
+  end
+  
+  unwanted = session[:seen]
+  
   coll = MONGO_DB.collection("flags")
-  photos = coll.find()
+  
+  if unwanted == ""
+    photos = coll.find()
+  else
+    photos = coll.find({"photo_id" => { "$not" => /#{unwanted}/ } })
+  end
+  
   @first = photos.next_document
+  
+  if session[:seen] == ""
+    session[:seen] = "^#{@first['photo_id']}$"
+  else
+    session[:seen] += "|^#{@first['photo_id']}$"
+  end
   
   @mp_name = format_name_for_url(@first['name'])
 
