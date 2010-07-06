@@ -1,0 +1,12 @@
+%html
+  %head
+    %title Recognise An MP
+    %link{:type => "text/css", :rel => "stylesheet", :href => "/stylesheets/styles.css"}
+    %meta{:charset => "UTF-8"}
+  %body
+    %p <a href="/">Recognise An MP data</a>
+    = yield
+    %br
+    %hr
+    - if request.path_info != "/about"
+      About RAMP. <a href="about">Sources. Contact. Code.</a>
