@@ -15,6 +15,7 @@ module Sinatra
             user = ENV['ADMIN_USER']
             pass = ENV['ADMIN_PASS']
             ips = ENV['ADMIN_IPS']
+            raise ips
           else
             admin_conf = YAML.load(File.read('config/virtualserver/admin.yml'))
             user = admin_conf[:user]
