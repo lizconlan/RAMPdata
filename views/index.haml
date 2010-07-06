@@ -1,4 +1,5 @@
-This is supposed to be a photo of #{@first['name']}
+This is supposed to be a photo of 
+%b= "#{@first['name']} MP"
 
 %br
 %br
@@ -15,22 +16,19 @@ This is supposed to be a photo of #{@first['name']}
 %br
 
 %a{:href => "/unflag/#{@first['photo_id']}"}
-  This is a photo of #{@first['name']}
+  This is a photo of #{@first['name']} MP
   
 %br
-%br
-
-This is not a photo of #{@first['name']} ...
-
-%br
-
-%a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
-  but there is another MP in this photo
-  
 %br
 
 %a{:href => "/stop_photo/#{@first['photo_id']}"} 
-  there is not an MP in this photo
+  There are no MPs in this photo
+
+%br
+%br
+
+%a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
+  #{@first['name']} is not in this photo, but there is another MP here
 
 %br
 %br
