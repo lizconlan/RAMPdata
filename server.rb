@@ -48,19 +48,23 @@ get '/' do
   else
     photos = coll.find({"photo_id" => { "$not" => /#{unwanted}/ } })
   end
-  @count = photos.count
   
-  @first = photos.next_document
+  if photos.count > 0
+  @count = photos.count  
+    @first = photos.next_document
   
-  if session[:seen] == ""
-    session[:seen] = "^#{@first['photo_id']}$"
+    if session[:seen] == ""
+      session[:seen] = "^#{@first['photo_id']}$"
+    else
+      session[:seen] += "|^#{@first['photo_id']}$"
+    end
+  
+    @mp_name = format_name_for_url(@first['name'])
+  
+    haml :index
   else
-    session[:seen] += "|^#{@first['photo_id']}$"
+    haml :no_photo
   end
-  
-  @mp_name = format_name_for_url(@first['name'])
-
-  haml :index
 end
 
 get "/unflag/:photo_id" do
