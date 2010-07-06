@@ -174,7 +174,7 @@ get "/stop_flickr_user/:user_id" do
   first = user_doc.next_document()
 
   unless first
-    redirect "/admin"
+    redirect "/"
   else
     users = first["users"]
     names = first["users_names"]
@@ -224,7 +224,7 @@ post '/login' do
 
   if params[:user] == user && params[:pass] == pass
     session[:authorized] = true
-    redirect '/admin'
+    redirect '/'
   else
     session[:authorized] = false
     redirect '/login'
