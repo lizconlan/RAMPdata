@@ -204,6 +204,30 @@ get "/stop_flickr_user/:user_id" do
   end
 end
 
+get '/login' do
+  haml :admin_login
+end
+
+post '/login' do
+  if ENV['RACK_ENV'] && ENV['RACK_ENV'] == 'production'
+    user = ENV['ADMIN_USER']
+    pass = ENV['ADMIN_PASS']
+  else
+    admin_conf = YAML.load(File.read('config/virtualserver/admin.yml'))
+    user = admin_conf[:user]
+    pass = admin_conf[:pass]
+  end
+
+  if params[:user] == user && params[:pass] == pass
+    session[:authorized] = true
+    redirect '/admin'
+  else
+    session[:authorized] = false
+    redirect '/login'
+  end
+end
+
+
 private
   def do_auth
     ip = @env["REMOTE_HOST"]
