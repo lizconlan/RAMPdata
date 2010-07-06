@@ -46,6 +46,7 @@ get '/' do
   else
     photos = coll.find({"photo_id" => { "$not" => /#{unwanted}/ } })
   end
+  @count = photos.count
   
   @first = photos.next_document
   
