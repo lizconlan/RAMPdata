@@ -15,7 +15,6 @@ module Sinatra
             user = ENV['ADMIN_USER']
             pass = ENV['ADMIN_PASS']
             ips = ENV['ADMIN_IPS']
-            raise ips
           else
             admin_conf = YAML.load(File.read('config/virtualserver/admin.yml'))
             user = admin_conf[:user]
@@ -23,6 +22,8 @@ module Sinatra
             ips = admin_conf[:allowed_ips]
           end
 
+          raise ip_address
+          
           if ip_address && ips.split("|").include?(ip_address)
             session[:authorized] = true
           else
