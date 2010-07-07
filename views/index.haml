@@ -5,13 +5,13 @@
     YES
     
   %a{:href => "/stop_photo/#{@first['photo_id']}"} 
-    No MP
+    Not MP
   
   %a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
-    Different MP
+    Other MP
 
   %a{:href => '/'}
-    Can't tell
+    Pass
 
 %p
   %img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
