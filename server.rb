@@ -33,6 +33,8 @@ end
 MONGO_DB = get_mongo_connection()
 
 get '/' do
+  do_auth()
+  
   unless session[:seen]
     session[:seen] = ""
   end
@@ -46,23 +48,27 @@ get '/' do
   else
     photos = coll.find({"photo_id" => { "$not" => /#{unwanted}/ } })
   end
-  @count = photos.count
   
-  @first = photos.next_document
+  if photos.count > 0
+  @count = photos.count  
+    @first = photos.next_document
   
-  if session[:seen] == ""
-    session[:seen] = "^#{@first['photo_id']}$"
+    if session[:seen] == ""
+      session[:seen] = "^#{@first['photo_id']}$"
+    else
+      session[:seen] += "|^#{@first['photo_id']}$"
+    end
+  
+    @mp_name = format_name_for_url(@first['name'])
+  
+    haml :index
   else
-    session[:seen] += "|^#{@first['photo_id']}$"
+    haml :no_photo
   end
-  
-  @mp_name = format_name_for_url(@first['name'])
-
-  haml :index
 end
 
 get "/unflag/:photo_id" do
-  #do_auth()
+  do_auth()
   
   coll = MONGO_DB.collection("flags")
   
@@ -76,7 +82,7 @@ get "/unflag/:photo_id" do
 end
 
 get "/stop_mp_photo/:mp_name/:photo_id" do
-  #do_auth()
+  do_auth()
   
   coll = MONGO_DB.collection("stoplist")
   
@@ -107,7 +113,7 @@ get "/stop_mp_photo/:mp_name/:photo_id" do
 end
 
 get "/stop_photo/f/:photo_id" do
-  #do_auth()
+  do_auth()
   
   @photo_id =  params[:photo_id]
   
@@ -126,7 +132,7 @@ get "/stop_photo/f/:photo_id" do
 end
 
 get "/stop_photo/:photo_id" do
-  #do_auth()
+  do_auth()
   
   @photo_id =  params[:photo_id]
   
@@ -160,7 +166,7 @@ get "/stop_photo/:photo_id" do
 end
 
 get "/stop_flickr_user/:user_id" do
-  #do_auth()
+  do_auth()
 
   coll = MONGO_DB.collection("stoplist")
 
@@ -168,7 +174,7 @@ get "/stop_flickr_user/:user_id" do
   first = user_doc.next_document()
 
   unless first
-    redirect "/admin"
+    redirect "/"
   else
     users = first["users"]
     names = first["users_names"]
@@ -202,11 +208,36 @@ get "/stop_flickr_user/:user_id" do
   end
 end
 
+get '/login' do
+  haml :admin_login
+end
+
+post '/login' do
+  if ENV['RACK_ENV'] && ENV['RACK_ENV'] == 'production'
+    user = ENV['ADMIN_USER']
+    pass = ENV['ADMIN_PASS']
+  else
+    admin_conf = YAML.load(File.read('config/virtualserver/admin.yml'))
+    user = admin_conf[:user]
+    pass = admin_conf[:pass]
+  end
+
+  if params[:user] == user && params[:pass] == pass
+    session[:authorized] = true
+    redirect '/'
+  else
+    session[:authorized] = false
+    redirect '/login'
+  end
+end
+
+
 private
   def do_auth
     ip = @env["REMOTE_HOST"]
-    ip = @env["REMOTE_ADDR"] unless ip
     ip = @env["HTTP_X_REAL_IP"] unless ip
+    ip = @env["REMOTE_ADDR"] unless ip
+    
     authorize!(ip)
   end
   

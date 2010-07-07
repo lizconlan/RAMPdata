@@ -1,2 +1,9 @@
 %html
-  = yield
+  %head
+    %title RAMPdata
+    %link{:type => "text/css", :rel => "stylesheet", :href => "http://ramp.heroku.com/stylesheets/styles.css"}
+    %meta{:charset => "UTF-8"}
+  %body
+    %p <a href="/">RAMP data</a> | <a href="http://ramp.heroku.com">RAMP</a>
+    = yield
+  

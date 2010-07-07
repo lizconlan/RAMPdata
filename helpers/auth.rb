@@ -21,7 +21,7 @@ module Sinatra
             pass = admin_conf[:pass]
             ips = admin_conf[:allowed_ips]
           end
-
+          
           if ip_address && ips.include?(ip_address)
             session[:authorized] = true
           else

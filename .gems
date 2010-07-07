@@ -2,3 +2,6 @@ memcached
 mongo
 bson
 bson_ext
+sinatra
+haml
+json
