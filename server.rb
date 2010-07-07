@@ -67,6 +67,10 @@ get '/' do
   end
 end
 
+get "/about" do
+  haml :about
+end
+
 get "/unflag/:photo_id" do
   do_auth()
   
