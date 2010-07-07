@@ -1,44 +1,22 @@
-Photos viewed: #{session[:seen].split("|").count}
-%br
-Unviewed photos: #{@count}
+%h2 Is this #{@first['name']} MP?
 
-%br
-%br
-
-This is supposed to be a photo of 
-%b= "#{@first['name']} MP"
-
-%br
-%br
-
-%img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
-
-%br
-
-%a{:href => "http://www.flickr.com/photos/#{@first['author_id']}/#{@first['photo_id'].to_s}"}
-  View this photo on Flickr
+#triage
+  %a{:href => "/unflag/#{@first['photo_id']}"}
+    YES
+    
+  %a{:href => "/stop_photo/#{@first['photo_id']}"} 
+    No MP
   
-%br
-%hr
-%br
+  %a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
+    Different MP
 
-%a{:href => "/unflag/#{@first['photo_id']}"}
-  This is a photo of #{@first['name']} MP
-  
-%br
-%br
+  %a{:href => '/'}
+    Can't tell
 
-%a{:href => "/stop_photo/#{@first['photo_id']}"} 
-  There are no MPs in this photo
-
+%p
+  %img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
 %br
-%br
+  %a{:href => "http://www.flickr.com/photos/#{@first['author_id']}/#{@first['photo_id'].to_s}"}
+    View this photo on Flickr
 
-%a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
-  #{@first['name']} is not in this photo, but there is another MP here
-
-%br
-%br
-
-%a{:href => '/'}
-  I'm not sure
+%p You've seen #{session[:seen].split("|").count} of #{@count} flagged images.
