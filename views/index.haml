@@ -5,18 +5,16 @@
     YES
     
   %a{:href => "/stop_photo/#{@first['photo_id']}"} 
-    Not MP
+    NO
   
   %a{:href => "/stop_mp_photo/#{@mp_name}/#{@first['photo_id']}"} 
-    Other MP
+    It's another MP
 
   %a{:href => '/'}
     Pass
 
 %p
-  %img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
-%br
-  %a{:href => "http://www.flickr.com/photos/#{@first['author_id']}/#{@first['photo_id'].to_s}"}
-    View this photo on Flickr
+  %a{:href => "http://www.flickr.com/photos/#{@first['author_id']}/#{@first['photo_id'].to_s}", :title=>"See this image on Flickr"}
+    %img{:src => "http://farm#{@first["flickr_farm"].to_s}.static.flickr.com/#{@first["flickr_server"].to_s}/#{@first["photo_id"].to_s}_#{@first["flickr_secret"].to_s}.jpg"}
 
-%p You've seen #{session[:seen].split("|").count} of #{@count} flagged images.
+%p You've seen #{session[:seen].split("|").count} flagged images. There are #{@count} others.
