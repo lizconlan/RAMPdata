@@ -67,11 +67,11 @@ get '/' do
   end
 end
 
-get "/about" do
+get "/about/?" do
   haml :about
 end
 
-get "/unflag/:photo_id" do
+get "/unflag/:photo_id/?" do
   do_auth()
   
   coll = MONGO_DB.collection("flags")
@@ -85,7 +85,7 @@ get "/unflag/:photo_id" do
   end
 end
 
-get "/stop_mp_photo/:mp_name/:photo_id" do
+get "/stop_mp_photo/:mp_name/:photo_id/?" do
   do_auth()
   
   coll = MONGO_DB.collection("stoplist")
@@ -116,7 +116,7 @@ get "/stop_mp_photo/:mp_name/:photo_id" do
   end
 end
 
-get "/stop_photo/f/:photo_id" do
+get "/stop_photo/f/:photo_id/?" do
   do_auth()
   
   @photo_id =  params[:photo_id]
@@ -135,7 +135,7 @@ get "/stop_photo/f/:photo_id" do
   end
 end
 
-get "/stop_photo/:photo_id" do
+get "/stop_photo/:photo_id/?" do
   do_auth()
   
   @photo_id =  params[:photo_id]
@@ -169,7 +169,7 @@ get "/stop_photo/:photo_id" do
   end
 end
 
-get "/stop_flickr_user/:user_id" do
+get "/stop_flickr_user/:user_id/?" do
   do_auth()
 
   coll = MONGO_DB.collection("stoplist")
@@ -212,7 +212,7 @@ get "/stop_flickr_user/:user_id" do
   end
 end
 
-get '/login' do
+get '/login/?' do
   haml :admin_login
 end
 
