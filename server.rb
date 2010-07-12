@@ -33,6 +33,40 @@ end
 MONGO_DB = get_mongo_connection()
 
 get '/' do
+  do_auth()
+  
+  unless session[:seen]
+    session[:seen] = ""
+  end
+  
+  unwanted = session[:seen]
+  
+  coll = MONGO_DB.collection("flags")
+  
+  if unwanted == ""
+    photos = coll.find()
+  else
+    photos = coll.find({"photo_id" => { "$not" => /#{unwanted}/ } })
+  end
+  
+  if photos.count > 0
+  @count = photos.count  
+    @first = photos.next_document
+  
+    if session[:seen] == ""
+      session[:seen] = "^#{@first['photo_id']}$"
+    else
+      session[:seen] += "|^#{@first['photo_id']}$"
+    end
+  
+    @mp_name = format_name_for_url(@first['name'])
+  
+    haml :index
+  else
+    haml :no_photo
+  end
+end
+
 
 get "/unflag/:photo_id/?" do
   do_auth()
